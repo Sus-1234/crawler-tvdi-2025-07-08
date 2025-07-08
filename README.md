@@ -1,9 +1,9 @@
 # crawler-tvdi-2025-07-08
 2025/07/08 Python課
 
-##Feature
+## Feature
 
-python basic
-python class
-python crawler
-python window
+ - python basic
+ - python class
+ - python crawler
+ - python window
