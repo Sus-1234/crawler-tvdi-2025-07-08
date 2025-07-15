@@ -1,5 +1,7 @@
 import json
 from pprint import pprint
+import argparse
+
 class Site:
     def __init__(self,
                  sitename,
@@ -11,7 +13,7 @@ class Site:
                  pm2_5_avg,
                  latitude,
                  longitude,
-                 datacreationdate):   
+                 datacreationdate):    
         self.sitename = sitename
         self.county = county
         self.aqi = aqi
@@ -23,26 +25,35 @@ class Site:
         self.longitude = longitude
         self.datacreationdate = datacreationdate
 
-def parse_sites_from_json(json_path):
-    with open(json_path, 'r', encoding='utf-8') as file:
+def parse_sites_from_json(json_file):
+    with open(json_file, 'r', encoding='utf-8') as file:
         data = json.load(file)
     site_list = []
-    for record in data['records']:
+    for sitename in data['records']:
         site = Site(
-            sitename=record['sitename'],
-            county=record['county'],
-            aqi=record['aqi'],
-            pollutant=record['pollutant'],
-            status=record['status'],
-            pm2_5=record['pm2.5'],
-            pm2_5_avg=record['pm2.5_avg'],
-            latitude=record['latitude'],
-            longitude=record['longitude'],
-            datacreationdate=record['datacreationdate']
+            sitename=sitename['sitename'],
+            county=sitename['county'],
+            aqi=sitename['aqi'],
+            pollutant=sitename['pollutant'],
+            status=sitename['status'],
+            pm2_5=sitename['pm2.5'],
+            pm2_5_avg=sitename['pm2.5_avg'],
+            latitude=sitename['latitude'],
+            longitude=sitename['longitude'],
+            datacreationdate=sitename['datacreationdate']
         )
         site_list.append(site)
     return site_list
 
-parsed_sites = parse_sites_from_json('aqx_p_488.json')
-for site in parsed_sites:
-    print(f"站點名稱: {site.sitename}, 所在縣市: {site.county}, AQI: {site.aqi}, 主要污染物: {site.pollutant}")
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='AQI 資料查詢 CLI')
+    parser.add_argument('-c', '--county', '--country', dest='county', help='過濾縣市名稱', default=None)
+    parser.add_argument('--file', '-f', help='JSON 檔案路徑', default='aqx_p_488.json')
+    args = parser.parse_args()
+
+    parsed_sites = parse_sites_from_json(args.file)
+    if args.county:
+        parsed_sites = [s for s in parsed_sites if s.county == args.county]
+    for site in parsed_sites:
+        print(f"站點名稱: {site.sitename}, 所在縣市: {site.county}, AQI: {site.aqi}, 主要污染物: {site.pollutant}")
